@@ -17,6 +17,7 @@ function App() {
         hash,
     })
     
+    // todo 优化红旗移动频率
     const {
         data,
         error,
