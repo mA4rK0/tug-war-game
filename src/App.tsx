@@ -63,7 +63,7 @@ function App() {
     // 计算旗子偏移量
     const flagOffset = (ropePositionOnChain?.result && maxScoreDifferenceOnChain?.result) 
         ? Number(ropePositionOnChain.result) * 40 / Number(maxScoreDifferenceOnChain.result) * 5 
-        : ropePosition * 5 // 每单位移动5%
+        : ropePosition * 5
 
     console.log("Rendering with rope position:", ropePosition, "Flag offset:", flagOffset)
 
@@ -84,7 +84,7 @@ function App() {
 
                 <div
                     className="tug-of-war-rope-line"
-                    style={{"--flag-offset": `${flagOffset}%`} as { [key: string]: string }}
+                    style={{"--flag-offset": `${flagOffset}%`}}
                 >
                     <div className="tug-of-war-rope-center"></div>
                     <div className="tug-of-war-flag">
