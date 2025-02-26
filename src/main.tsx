@@ -6,6 +6,7 @@ import { WagmiProvider } from 'wagmi'
 
 import App from './App.tsx'
 import { config } from './wagmi.ts'
+import { Wallets } from './wallets.tsx'
 
 import './index.css'
 
@@ -17,6 +18,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
+        <Wallets />
         <App />
       </QueryClientProvider>
     </WagmiProvider>

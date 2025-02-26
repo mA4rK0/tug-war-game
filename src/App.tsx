@@ -1,46 +1,127 @@
-import { useAccount, useConnect, useDisconnect } from 'wagmi'
+import {
+    type BaseError,
+    useWaitForTransactionReceipt,
+    useWriteContract,
+    useReadContracts,
+} from 'wagmi'
+import { wagmiContractConfig } from './contracts'
+import "./index.css"
 
 function App() {
-  const account = useAccount()
-  const { connectors, connect, status, error } = useConnect()
-  const { disconnect } = useDisconnect()
+    const ropePosition = 0
+    const team1Score = 0
+    const team2Score = 0
+    
+    const { data: hash, writeContract } = useWriteContract()
+    const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+        hash,
+    })
+    
+    const {
+        data,
+        error,
+        isPending,
+    } = useReadContracts({
+        contracts: [{
+            ...wagmiContractConfig,
+            functionName: 'ropePosition',
+        }, {
+            ...wagmiContractConfig,
+            functionName: 'maxScoreDifference',
+        }, {
+            ...wagmiContractConfig,
+            functionName: 'team1Score',
+        }, {
+            ...wagmiContractConfig,
+            functionName: 'team2Score',
+        }, {
+            ...wagmiContractConfig,
+            functionName: 'getWinStatus',
+        },]
+    })
 
-  return (
-    <>
-      <div>
-        <h2>Account</h2>
+    const [ropePositionOnChain, maxScoreDifferenceOnChain, team1ScoreOnChain, team2ScoreOnChain, winStatusOnChain] = data || []
 
-        <div>
-          status: {account.status}
-          <br />
-          addresses: {JSON.stringify(account.addresses)}
-          <br />
-          chainId: {account.chainId}
+    if (isPending) return <div>Loading...</div>
+
+    if (error)
+        return (
+            <div>
+                Error: {(error as BaseError).shortMessage || error.message}
+            </div>
+        )
+
+    const pullRope = (isTeam1: boolean) => {
+        writeContract({
+            address: wagmiContractConfig.address,
+            abi: wagmiContractConfig.abi,
+            functionName: 'pull',
+            args: [isTeam1],
+        })
+    }
+
+    // 计算旗子偏移量
+    const flagOffset = (ropePositionOnChain?.result && maxScoreDifferenceOnChain?.result) 
+        ? Number(ropePositionOnChain.result) * 40 / Number(maxScoreDifferenceOnChain.result) * 5 
+        : ropePosition * 5 // 每单位移动5%
+
+    console.log("Rendering with rope position:", ropePosition, "Flag offset:", flagOffset)
+
+    return (
+        <div className="tug-of-war-container">
+            <h1 className="tug-of-war-title">Tug of War</h1>
+            <div className="tug-of-war-score-board">
+                <div className="tug-of-war-team1-score">Team 1 scores: {team1ScoreOnChain?.result ?? team1Score}</div>
+                <div className="tug-of-war-team2-score">Team 2 scores: {team2ScoreOnChain?.result ?? team2Score}</div>
+            </div>
+
+
+            {(winStatusOnChain && Number(winStatusOnChain.result) === 1) && <h1 className="tug-of-war-title">Team 1 Win</h1>}
+            {(winStatusOnChain && Number(winStatusOnChain.result) === 2) && <h1 className="tug-of-war-title">Team 2 Win</h1>}
+
+            <div className="tug-of-war-field">
+                <div className="tug-of-war-team1">Team 1</div>
+
+                <div
+                    className="tug-of-war-rope-line"
+                    style={{"--flag-offset": `${flagOffset}%`} as { [key: string]: string }}
+                >
+                    <div className="tug-of-war-rope-center"></div>
+                    <div className="tug-of-war-flag">
+                        <div className="tug-of-war-flag-triangle"></div>
+
+                    </div>
+                </div>
+                <div className="tug-of-war-team2">Team 2</div>
+            </div>
+
+            <div className="tug-of-war-controls">
+                <button className="tug-of-war-pull-button" onClick={() => pullRope(true)}>Cheer for Team 1</button>
+                <button className="tug-of-war-pull-button" onClick={() => pullRope(false)}>Cheer for Team 2</button>
+            </div>
+            <div className="m-4">
+                <p>[OnChain] ropePosition: {ropePositionOnChain?.result ?? 0},
+                    team1Score: {team1ScoreOnChain?.result ?? 0},
+                    team2Score: {team2ScoreOnChain?.result ?? 0}
+                </p>
+                {isPending && 'Confirming...'}
+
+                {hash && <div>Transaction Hash:
+                    <a href={`https://sepolia.etherscan.io/tx/${hash}`} target="_blank">{hash.substring(0, 6) + "..." + hash.substring(hash.length - 4)}</a>
+                </div>
+                }
+
+                {isConfirming && <div>Waiting for confirmation...</div>}
+                {isConfirmed && <div>Transaction confirmed.</div>}
+                {error && (
+                    <div>Error: {(error as BaseError).shortMessage || error}</div>
+                )}
+
+            </div>
         </div>
-
-        {account.status === 'connected' && (
-          <button type="button" onClick={() => disconnect()}>
-            Disconnect
-          </button>
-        )}
-      </div>
-
-      <div>
-        <h2>Connect</h2>
-        {connectors.map((connector) => (
-          <button
-            key={connector.uid}
-            onClick={() => connect({ connector })}
-            type="button"
-          >
-            {connector.name}
-          </button>
-        ))}
-        <div>{status}</div>
-        <div>{error?.message}</div>
-      </div>
-    </>
-  )
+    )
 }
+
+
 
 export default App
