@@ -49,6 +49,8 @@ $ anvil
 
 ```shell
 $ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+
+$ forge create --rpc-url $MONAD --private-key $DEPLOYER_PRIVATE_KEY src/TugWarContract.sol:TugWarContract --constructor-args "0x53D84f59C3b4000a3337dB9dF196E36D70fE6954"
 ```
 
 ### Cast
