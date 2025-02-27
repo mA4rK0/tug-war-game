@@ -3,9 +3,11 @@ import {
     useWaitForTransactionReceipt,
     useWriteContract,
     useReadContracts,
+    useBlockNumber,
 } from 'wagmi'
 import { wagmiContractConfig } from './contracts'
 import "./index.css"
+import { useEffect } from 'react'
 
 function App() {
     const ropePosition = 0
@@ -17,11 +19,11 @@ function App() {
         hash,
     })
     
-    // todo 优化红旗移动频率
     const {
         data,
         error,
         isPending,
+        refetch
     } = useReadContracts({
         contracts: [{
             ...wagmiContractConfig,
@@ -41,6 +43,13 @@ function App() {
         },]
     })
 
+    const { data: blockNumber } = useBlockNumber({ watch: true })
+
+    useEffect(() => {
+        if (blockNumber && blockNumber % BigInt(5) === BigInt(0)) refetch()
+        refetch()
+    }, [blockNumber])
+      
     const [ropePositionOnChain, maxScoreDifferenceOnChain, team1ScoreOnChain, team2ScoreOnChain, winStatusOnChain] = data || []
 
     if (isPending) return <div>Loading...</div>
