@@ -46,7 +46,8 @@ function App() {
     const { data: blockNumber } = useBlockNumber({ watch: true })
 
     useEffect(() => {
-        if (blockNumber && blockNumber % BigInt(5) === BigInt(0)) refetch()
+        // if (blockNumber && blockNumber % BigInt(5) === BigInt(0)) 
+        refetch()
     }, [blockNumber])
       
     const [ropePositionOnChain, maxScoreDifferenceOnChain, team1ScoreOnChain, team2ScoreOnChain, winStatusOnChain] = data || []
