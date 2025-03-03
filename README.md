@@ -72,12 +72,12 @@ forge test
 4. Deploy Contract
 ```bash
 # Creating .env file and Setting environment variables
-PRIVATE_KEY=your_private_key
-RPC_URL=https://testnet-rpc.monad.xyz/
+DEPLOYER_PRIVATE_KEY=your_private_key
+MONAD=https://testnet-rpc.monad.xyz/
 
 # Deploy to Monad testnet
-forge create --rpc-url $RPC_URL \
-    --private-key $PRIVATE_KEY \
+forge create --rpc-url $MONAD \
+    --private-key $DEPLOYER_PRIVATE_KEY \
     --broadcast \
     src/TugWarContract.sol:TugWarContract \
     --constructor-args your_owner_address
