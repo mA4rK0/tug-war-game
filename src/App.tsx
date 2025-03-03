@@ -47,7 +47,6 @@ function App() {
 
     useEffect(() => {
         if (blockNumber && blockNumber % BigInt(5) === BigInt(0)) refetch()
-        refetch()
     }, [blockNumber])
       
     const [ropePositionOnChain, maxScoreDifferenceOnChain, team1ScoreOnChain, team2ScoreOnChain, winStatusOnChain] = data || []
@@ -94,7 +93,9 @@ function App() {
 
                 <div
                     className="tug-of-war-rope-line"
-                    style={{"--flag-offset": `${flagOffset}%`}}
+                    style={{
+                        "--flag-offset": `${flagOffset}%`
+                    } as React.CSSProperties & { '--flag-offset': string }}
                 >
                     <div className="tug-of-war-rope-center"></div>
                     <div className="tug-of-war-flag">

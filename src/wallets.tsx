@@ -13,6 +13,11 @@ export function Wallets() {
           <div className="wallet-info">
             <div>Status: <span className="wallet-status">{account.status}</span></div>
             {account.chainId && <div>Chain ID: <span className="wallet-chainid">{account.chainId}</span></div>}
+            {account.address && (
+              <div>Address: <span className="wallet-address">
+                {account.address.substring(0, 6)}...{account.address.substring(account.address.length - 4)}
+              </span></div>
+            )}
           </div>
           
           <div className="wallet-actions">

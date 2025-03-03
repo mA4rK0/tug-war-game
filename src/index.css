@@ -228,6 +228,12 @@ p {
   cursor: not-allowed;
 }
 
+.wallet-address {
+  font-family: monospace;
+  color: #2196F3;
+  font-weight: bold;
+}
+
 
 
 
