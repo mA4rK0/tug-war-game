@@ -1,68 +1,133 @@
-## Foundry
+# Tug of War Game
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+A blockchain-based online tug-of-war game implemented with Solidity smart contracts and React frontend. Players can choose to support Team 1 or Team 2 by sending transactions to cheer for their team.
 
-Foundry consists of:
+## Game Rules
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+1. Players connect their wallet to participate
+2. Each player can choose to support either Team 1 or Team 2
+3. Supporting a team requires sending a transaction
+4. The rope position moves based on the cumulative score difference
+5. A team wins when their score exceeds the other team by maxScoreDifference points
+6. The game can be reset by the contract owner
 
-## Documentation
 
-https://book.getfoundry.sh/
+## Project Architecture
 
-## Usage
+- Smart Contract: Written in Solidity, based on Foundry framework
+- Frontend: React + TypeScript + Wagmi + Viem
+- Network: Monad Testnet
 
-### Build
+## Contract Features
 
-```shell
-$ forge build
+- `pull(bool isTeam1)`: Cheer for the selected team
+- `getWinStatus()`: Get current game status
+- `reSet(uint8 _maxScoreDifference)`: Reset game (admin only)
+
+## Quick Start
+
+### Clone the Repository
+
+```bash
+git clone git@github.com:moonshotcommons/tug-war-game.git
+cd tug-war-game
 ```
 
-### Test
+### Project Structure
 
-```shell
-$ forge test
+```
+├── contracts/
+│   └── tug-war-contract/
+│       ├── src/
+│       │   └── TugWarContract.sol    # Main contract
+│       └── test/
+│           └── TugWarContract.sol    # Contract tests
+├── src/
+│   ├── App.tsx                       # Main game component
+│   ├── wallets.tsx                   # Wallet connection component
+│   ├── wagmi.ts                      # Wagmi configuration
+│   └── index.css                     # Styles
+└── package.json
 ```
 
-### Format
+### Contract Part
 
-```shell
-$ forge fmt
+1. Install Foundry
+```bash
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
 ```
 
-### Gas Snapshots
-
-```shell
-$ forge snapshot
+2. Install Dependencies
+```bash
+cd contracts/tug-war-contract
+forge install
 ```
 
-### Anvil
-
-```shell
-$ anvil
+3. Run Tests
+```bash
+forge test
 ```
 
-### Deploy
+4. Deploy Contract
+```bash
+# Set environment variables
+export PRIVATE_KEY=your_private_key
+export RPC_URL=https://testnet-rpc.monad.xyz/
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-
-$ forge create --rpc-url $MONAD --private-key $DEPLOYER_PRIVATE_KEY src/TugWarContract.sol:TugWarContract --constructor-args "0x53D84f59C3b4000a3337dB9dF196E36D70fE6954"
+# Deploy to Monad testnet
+forge create --rpc-url $RPC_URL \
+    --private-key $PRIVATE_KEY \
+    src/TugWarContract.sol:TugWarContract \
+    --constructor-args your_owner_address
 ```
 
-### Cast
+### Frontend Part
 
-```shell
-$ cast <subcommand>
+1. Install Dependencies
+```bash
+cd ../..  # Return to project root
+pnpm install
 ```
 
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+2. Start Development Server
+```bash
+pnpm run dev
 ```
+
+## Technical Details
+
+### Smart Contract
+- Written in Solidity 0.8.0
+- Uses Foundry for development and testing
+- Key state variables:
+  - `ropePosition`: Current position of the rope (-5 to 5)
+  - `team1Score` & `team2Score`: Current scores
+  - `maxScoreDifference`: Points needed to win
+
+### Frontend
+- Built with React and TypeScript
+- Uses Wagmi for Monad interactions
+- Features:
+  - Real-time score updates
+  - Visual rope movement
+  - Wallet connection management
+  - Transaction status display
+
+## Development Guide
+
+### Modifying the Contract
+1. Edit `contracts/tug-war-contract/src/TugWarContract.sol`
+2. Run tests: `forge test`
+3. Deploy changes: `forge create ...`
+4. **Update frontend contract address**
+
+### Modifying the Frontend
+1. Components are in `src/`
+2. Main game logic in `App.tsx`
+3. Wallet connection in `wallets.tsx`
+4. Styles in `index.css`
+
+
+## License
+MIT
